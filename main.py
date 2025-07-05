@@ -24,7 +24,7 @@ app = FastAPI()
 def get_articles() -> list[dict[str, Any]]:
     # cursor.execute(""" SELECT id, slug, title, description, body, "tagList", "favoritesCount" FROM public.articles; """)
     cursor.execute(
-        """ SELECT * FROM public.articles WHERE "authorId" = 2 AND "description" = 'first-article1' AND id > 11182 AND id < 11200; """)
+        """ SELECT * FROM public.articles WHERE "authorId" = 2 AN "description" = 'first-article1' AND id > 11182 AND id < 11200; """)
     data = cursor.fetchall()
 
     columns = [desc[0] for desc in cursor.description]
@@ -43,6 +43,12 @@ def get_articles_count():
 
 @app.get("/articles")
 async def root():
-    #return HTTPException(status_code=401, detail="Token Incorrect")
-    return {"articles": get_articles(), "count": get_articles_count()}
+    try:
+        return {"articles": get_articles(), "count": get_articles_count()}
+    except ValueError as e:
+        return HTTPException(status_code=400, detail=e)
+    except Exception as e:
+        # Catch other unexpected exceptions and raise a generic HTTPException
+        raise HTTPException(status_code=500, detail="ArticletycsService: unexpected error occurred")
+
 
