@@ -5,6 +5,10 @@ from typing import Any
 from fastapi import FastAPI, Request, HTTPException
 import psycopg2
 from config import database_config
+import random
+import queue
+import threading
+
 
 connection = psycopg2.connect(
     database=database_config["database"],
@@ -20,21 +24,34 @@ cursor = connection.cursor()
 print('__name__', __name__)
 app = FastAPI()
 
+result_queue = queue.Queue()
 
-def get_articles() -> list[dict[str, Any]]:
-    # cursor.execute(""" SELECT id, slug, title, description, body, "tagList", "favoritesCount" FROM public.articles; """)
-    cursor.execute(
-        """ SELECT * FROM public.articles WHERE "authorId" = 2 AND "description" = 'first-article1' AND id > 11182 AND id < 11200; """)
-    data = cursor.fetchall()
-
-    columns = [desc[0] for desc in cursor.description]
-    print('columns')
-
+# -> list[dict[str, Any]]
+def get_big_data():
+    print('get_big_data START')
     result = []
-    for row in data:
-        result.append(dict(zip(columns, row)))
 
-    return result
+    # cursor.execute(""" SELECT id, slug, title, description, body, "tagList", "favoritesCount" FROM public.articles; """)
+    # cursor.execute(
+    #     """ SELECT * FROM public.articles WHERE "authorId" = 2 AND "description" = 'first-article1' AND id > 11182 AND id < 11200; """)
+
+    cursor.execute(""" SELECT * FROM public.articles LIMIT 50000; """)
+    data = cursor.fetchall()
+    columns = [desc[0] for desc in cursor.description]
+
+    def id_parser(e):
+        return e['id']
+
+    for row in data:
+        list_row = list(row)
+        random_element = random.getrandbits(8000)
+        list_row.append(random_element)
+        result_row = list(list_row)
+        result.append(dict(zip(columns, result_row)))
+        result.sort(key=id_parser)
+
+    result_queue.put(result[0:10])
+
 
 def get_articles_count():
     cursor.execute(""" SELECT COUNT (*) FROM public.articles """)
@@ -44,10 +61,25 @@ def get_articles_count():
 
 @app.get("/articles")
 async def root():
+
+    thread = threading.Thread(target=get_big_data)
+    thread.start()
+    thread.join()
+    articles = result_queue.get()
+
+    # get_articles()
+    # articles = result_data
+    response_length = len(articles)
+
     try:
-        return {"articles": get_articles(), "count": get_articles_count()}
+        return {"count": get_articles_count(), "len": response_length, "articles": articles}
     except ValueError as e:
         return HTTPException(status_code=400, detail=e)
     except Exception as e:
         # Catch other unexpected exceptions and raise a generic HTTPException
         raise HTTPException(status_code=500, detail="ArticletycsService: unexpected error occurred")
+
+
+@app.get("/test")
+async def test():
+    return "test - ok"
