@@ -6,6 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="86fcb125-b58e-43cb-af37-10767f973cec" name="Changes" comment="go services upd">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/helloworld.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/helloworld1.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/helloworld2.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/helloworld3.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/helloworld4.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/helloworld5.go" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,15 +42,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/oleg/Documents/GitHub/streamway-articlelytics&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/Users/oleg/Documents/GitHub/streamway-services"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -161,7 +167,15 @@
       <option name="project" value="LOCAL" />
       <updated>1754053279873</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="go services upd">
+      <option name="closed" value="true" />
+      <created>1754054342212</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1754054342212</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">

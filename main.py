@@ -37,7 +37,6 @@ def get_big_data():
     # cursor.execute(""" SELECT id, slug, title, description, body, "tagList", "favoritesCount" FROM public.articles; """)
     # cursor.execute(
     #     """ SELECT * FROM public.articles WHERE "authorId" = 2 AND "description" = 'first-article1' AND id > 11182 AND id < 11200; """)
-
     cursor.execute(""" SELECT * FROM public.articles LIMIT 50000; """)
     data = cursor.fetchall()
     columns = [desc[0] for desc in cursor.description]
