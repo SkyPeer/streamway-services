@@ -5,13 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="86fcb125-b58e-43cb-af37-10767f973cec" name="Changes" comment="go services upd">
-      <change afterPath="$PROJECT_DIR$/helloworld3.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/helloworld4.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/helloworld5.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/helloworld.go" beforeDir="false" afterPath="$PROJECT_DIR$/helloworld.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/helloworld1.go" beforeDir="false" afterPath="$PROJECT_DIR$/helloworld1.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/helloworld2.go" beforeDir="false" afterPath="$PROJECT_DIR$/helloworld2.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -159,7 +153,15 @@
       <option name="project" value="LOCAL" />
       <updated>1754052226309</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="go services upd">
+      <option name="closed" value="true" />
+      <created>1754053279873</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1754053279873</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
