@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="86fcb125-b58e-43cb-af37-10767f973cec" name="Changes" comment="threading added">
-      <change afterPath="$PROJECT_DIR$/helloworld.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-    </list>
+    <list default="true" id="86fcb125-b58e-43cb-af37-10767f973cec" name="Changes" comment="go service added" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -131,7 +127,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751792685859</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="threading upd">
+      <option name="closed" value="true" />
+      <created>1754051943497</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1754051943497</updated>
+    </task>
+    <task id="LOCAL-00007" summary="go service added">
+      <option name="closed" value="true" />
+      <created>1754051953759</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1754051953759</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -139,6 +151,8 @@
     <MESSAGE value="articles request added" />
     <MESSAGE value="custom err message" />
     <MESSAGE value="update service" />
-    <option name="LAST_COMMIT_MESSAGE" value="update service" />
+    <MESSAGE value="threading upd" />
+    <MESSAGE value="go service added" />
+    <option name="LAST_COMMIT_MESSAGE" value="go service added" />
   </component>
 </project>
