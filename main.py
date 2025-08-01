@@ -8,7 +8,8 @@ from config import database_config
 import random
 import queue
 import threading
-
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 connection = psycopg2.connect(
     database=database_config["database"],
@@ -24,6 +25,8 @@ cursor = connection.cursor()
 print('__name__', __name__)
 app = FastAPI()
 
+# Create a thread pool executor for background tasks
+executor = ThreadPoolExecutor(max_workers=4)
 result_queue = queue.Queue()
 
 # -> list[dict[str, Any]]
@@ -51,20 +54,24 @@ def get_big_data():
         result.sort(key=id_parser)
 
     result_queue.put(result[0:10])
+    print('get_big_data END')
 
 
-def get_articles_count():
-    cursor.execute(""" SELECT COUNT (*) FROM public.articles """)
-    counter = cursor.fetchone()  # tupple
-    return counter[0]
+# def get_articles_count():
+#     cursor.execute(""" SELECT COUNT (*) FROM public.articles """)
+#     counter = cursor.fetchone()  # tupple
+#     return counter[0]
 
 
 @app.get("/articles")
 async def root():
 
-    thread = threading.Thread(target=get_big_data)
-    thread.start()
-    thread.join()
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(executor, get_big_data)
+
+    # thread = threading.Thread(target=get_big_data)
+    # thread.start()
+    # thread.join()
     articles = result_queue.get()
 
     # get_articles()
@@ -72,7 +79,7 @@ async def root():
     response_length = len(articles)
 
     try:
-        return {"count": get_articles_count(), "len": response_length, "articles": articles}
+        return {"len": response_length, "articles": articles}
     except ValueError as e:
         return HTTPException(status_code=400, detail=e)
     except Exception as e:
@@ -82,4 +89,9 @@ async def root():
 
 @app.get("/test")
 async def test():
-    return "test - ok"
+        return {
+            # "active_tasks": active_tasks,
+            "max_workers": executor._max_workers,
+            "threads": len(executor._threads),
+            "queue_size": executor._work_queue.qsize() if hasattr(executor._work_queue, 'qsize') else 0
+        }
