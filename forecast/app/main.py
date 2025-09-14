@@ -3,8 +3,6 @@ from fastapi import FastAPI
 from api.v1.endpoints import health
 app = FastAPI(title="Forecast Service")
 
-
-
 # Routers
 app.include_router(health.router, prefix="/api/v1")
 # app = FastAPI()
