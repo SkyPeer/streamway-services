@@ -1,13 +1,11 @@
 # toStart:
 # uvicorn main:app --reload --port 8000
 
-from typing import Any
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, HTTPException
 import psycopg2
-from config import database_config
+from meteo.config import database_config
 import random
 import queue
-import threading
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 
