@@ -1,23 +1,29 @@
 # uvicorn main:app --reload --port 8200
-from numbers import Number
 
 import requests
-from uuid import uuid4
-
-from fastapi import FastAPI, Request, HTTPException
-from sqlalchemy import Column, MetaData, Integer, create_engine, DateTime, func
-from sqlalchemy.engine import ObjectKind
-from sqlalchemy.orm import sessionmaker, declarative_base
+import os
+from fastapi import FastAPI, HTTPException
+from sqlalchemy import MetaData, create_engine
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import Session
 
 from sqlalchemy.sql.expression import select
-from sqlalchemy.sql.schema import Identity
-from sqlalchemy.sql.sqltypes import String
-from sqlalchemy.dialects.postgresql import insert
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String, Float
+from fastapi.middleware.cors import CORSMiddleware
+from config import get_meteo_url, meteo_config
 
-from models import CityModel, City
+import pandas as pd
+import psycopg2
+
+conn = psycopg2.connect(database="streamway", user="", password="", host="localhost", port="5432")
+
+# Read data from a table into a DataFrame
+
+from datetime import datetime
+
+origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3039").split(",")
+
+from models import CityModel, City, MeteoModel, Meteo
 
 engine = create_engine('postgresql+psycopg2://localhost:5432/streamway')
 
@@ -75,7 +81,12 @@ def get_url(cities):
 
     lat_parse = ",".join([str(num) for num in lat])
     lon_parse = ",".join([str(num) for num in lon])
-    url = ""
+    start_date = '2025-08-10'
+    end_date = '2025-08-22'
+
+    url = get_meteo_url(start_date, end_date, lat_parse, lon_parse)
+
+    print(url)
     return url
 
 
@@ -106,10 +117,19 @@ def get_meteo_items():
 # app = FastAPI(app = FastAPI(swagger_ui_parameters={"syntaxHighlight": False}))
 app = FastAPI()
 #
-@app.get("/meteo")
+@app.get("/meteo/duplicates")
 def meteo():
-        return "test - ok!"
+    # df = pd.read_sql("SELECT cityId, dt, count FROM meteo_temps WHERE count < 1 GROUP BY cityId, dt", conn)
+    df = pd.read_sql("""WITH counts AS (SELECT  "cityId", created, COUNT(*) AS cnt FROM meteo_temps GROUP BY "cityId", created) SELECT "cityId", created, cnt FROM counts WHERE cnt > 1;""", conn)
 
+
+    # Close the connection
+    print(type(df)) # class 'pandas.core.frame.DataFrame'
+    print(df)
+    # df_to_list = df.values[1]
+    # print('df_to_list', type(df_to_list))
+    # conn.close()
+    return len(df)
 
 class Item(BaseModel):
     text1: str
@@ -135,24 +155,7 @@ def fetch_meteo_data():
         print(f"Error fetching data: {e}")
         raise HTTPException(status_code=500, detail=f"open-meteo Api: {e}")
 
-
 # Meteo
-class Meteo(BaseModel):
-    min: int
-    max: int
-    description: str
-    cityId: int
-
-class MeteoModel(Base):
-    __tablename__ = 'meteo_temps'
-    id = Column(Integer, primary_key=True, autoincrement="auto")
-    min = Column(Integer)
-    max = Column(Integer)
-    created = Column(DateTime)
-    cityId = Column(Integer)
-
-
-
 def set_meteo_data():
 
     # Insert multiple records
@@ -172,9 +175,11 @@ def set_meteo_data():
         cities = get_cities()
         url = get_url(cities)
         response = requests.get(url)
-        print(url)
+        # print(url)
         response.raise_for_status()  # Raise an exception for bad status codes
         resp = response.json()
+
+        # print(resp)
 
         data = []
 
@@ -184,18 +189,48 @@ def set_meteo_data():
             data = resp
 
         for idx_city in range(len(data)):
-            minTemps = data[idx_city]['daily']['temperature_2m_min']
-            maxTemps = data[idx_city]['daily']['temperature_2m_max']
-            timestamps = data[idx_city]['daily']['time']
+            minTemps = data[idx_city][meteo_config["period"]][meteo_config["temp_min_pointer"]]
+            maxTemps = data[idx_city][meteo_config["period"]][meteo_config["temp_max_pointer"]]
+            windsSpeeds = data[idx_city][meteo_config["period"]][meteo_config["wind_speed_pointer"]]
+            windsDirections = data[idx_city][meteo_config["period"]][meteo_config["wind_direction_pointer"]]
+            timestamps = data[idx_city][meteo_config["period"]][meteo_config["time_pointer"]]
             print(type(minTemps))
 
             new_temps = []
+            cityId = cities[idx_city].id
+
+            # exists = session.query(MeteoModel).filter(MeteoModel.min == 27, MeteoModel.cityId == 1).exists()
+            # print(exists, 'exists')
+            #
+            # if session.query(exists).scalar():
+            #     print("User with this email already exists in department")
 
             for idx_temp in range(len(minTemps)):
                 min = minTemps[idx_temp]
                 max = maxTemps[idx_temp]
-                temp = MeteoModel(min=min, max=max, cityId=cities[idx_city].id, created=timestamps[idx_temp])
+                wind_speed = windsSpeeds[idx_temp]
+                wind_direction = windsDirections[idx_temp]
+                date_string = timestamps[idx_temp]
+                dt = datetime.strptime(date_string, "%Y-%m-%d")
+
+                # ForeCasting
+
+                # exsists = session.query(MeteoModel).filter(MeteoModel.cityId == cityId, MeteoModel.created == dt ).count() > 0
+
+                temp = MeteoModel(min=min,
+                                  max=max,
+                                  cityId=cityId,
+                                  timeStamp=dt,
+                                  random=False,
+                                  wind_speed = wind_speed,
+                                  wind_direction = wind_direction)
                 new_temps.append(temp)
+
+                # if exsists:
+                #     print('')
+                # else:
+                #     temp = MeteoModel(min=min, max=max, cityId=cityId, created=dt)
+                #     new_temps.append(temp)
 
             session.add_all(new_temps)
             session.commit()
@@ -215,6 +250,16 @@ def fetch():
 @app.get("/meteo/data")
 def test():
     return fetch_meteo_data()
+
+
+@app.get("/meteo/readings")
+def get_readings_data():
+    try:
+        with Session(engine) as session:
+            readings =  session.query(MeteoModel).all()
+            return readings
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching data: {e}")
 
 # get cities
 @app.get("/meteo/city/get")
@@ -240,3 +285,11 @@ def add_city(body: City):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching data: {e}")
     raise HTTPException(status_code=500, detail=f"open-meteo Api: {e}")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
